@@ -90,7 +90,7 @@ void OnTick()
 
       int ticket = OrderSend(Symbol(), OP_BUY, Lot_Size, entryPrice, 3, sl, tp, "Metavest BUY", 0, 0, clrGreen);
       if(ticket < 0)
-        Print("BUY order failed | Error: ", ErrorDescription(GetLastError()));
+        Print("BUY order failed | Error code: ", GetLastError());
       else
         Print("BUY order sent | Entry: ", entryPrice, " SL: ", sl, " TP: ", tp);
      }
@@ -103,7 +103,7 @@ void OnTick()
 
       int ticket = OrderSend(Symbol(), OP_SELL, Lot_Size, entryPrice, 3, sl, tp, "Metavest SELL", 0, 0, clrRed);
       if(ticket < 0)
-        Print("SELL order failed | Error: ", ErrorDescription(GetLastError()));
+        Print("SELL order failed | Error code: ", GetLastError());
       else
         Print("SELL order sent | Entry: ", entryPrice, " SL: ", sl, " TP: ", tp);
      }
