@@ -7,14 +7,14 @@
 #property strict
 
 // ===== INPUT PARAMETERS =====
-input int    MA_Fast_Period = 20;
-input int    MA_Slow_Period = 50;
+input int    MA_Fast_Period = 5;
+input int    MA_Slow_Period = 40;
 input double Lot_Size       = 0.01;
-input int    Stop_Loss      = 20;
-input int    Take_Profit    = 40;
-input int RSI_Period     = 14; //Period
-input int RSI_Overbought = 70; //Overbought
-input int RSI_Oversold = 30; //Oversold
+input int    Stop_Loss      = 80;
+input int    Take_Profit    = 180;
+input int RSI_Period     = 21; //Period
+input int RSI_Overbought = 90; //Overbought
+input int RSI_Oversold = 35; //Oversold
 
 //+------------------------------------------------------------------+
 //| Helper Function - Cek apakah sudah ada posisi terbuka            |
