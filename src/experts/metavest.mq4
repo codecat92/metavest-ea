@@ -12,6 +12,9 @@ input int    MA_Slow_Period = 50;
 input double Lot_Size       = 0.01;
 input int    Stop_Loss      = 20;
 input int    Take_Profit    = 40;
+input int RSI_Period     = 14; //Period
+input int RSI_Overbought = 70; //Overbought
+input int RSI_Oversold = 30; //Oversold
 
 //+------------------------------------------------------------------+
 //| Helper Function - Cek apakah sudah ada posisi terbuka            |
@@ -60,18 +63,23 @@ void OnTick()
    double maFastPrev = iMA(Symbol(), Period(), MA_Fast_Period, 0, MODE_SMA, PRICE_CLOSE, 1);
    double maSlowPrev = iMA(Symbol(), Period(), MA_Slow_Period, 0, MODE_SMA, PRICE_CLOSE, 1);
 
-   // === LANGKAH 3: Hitung SL dan TP ===
+   // === LANGKAH 3: Hitung nilai RSI ===
+   double rsi = iRSI(Symbol(), Period(), RSI_Period, PRICE_CLOSE, 0);
+   Print("MA Fast: ", maFast, " MA Slow: ", maSlow, " RSI: ", rsi);
+
+
+   // === LANGKAH 4: Hitung SL dan TP ===
    double point    = MarketInfo(Symbol(), MODE_POINT);
    double slPoints = Stop_Loss   * 10 * point;
    double tpPoints = Take_Profit * 10 * point;
 
-   // === LANGKAH 4: Deteksi sinyal ===
+   // === LANGKAH 5: Deteksi sinyal ===
 
-   // Golden Cross → MA Fast memotong MA Slow dari bawah ke atas → BUY
-   bool isBuySignal  = (maFastPrev < maSlowPrev) && (maFast > maSlow);
+   // Golden Cross → MA Fast memotong MA Slow dari bawah ke atas → BUY // dan RSI di bawah 70
+   bool isBuySignal  = (maFastPrev < maSlowPrev) && (maFast > maSlow) && (rsi < RSI_Overbought);
 
-   // Death Cross → MA Fast memotong MA Slow dari atas ke bawah → SELL
-   bool isSellSignal = (maFastPrev > maSlowPrev) && (maFast < maSlow);
+   // Death Cross → MA Fast memotong MA Slow dari atas ke bawah → SELL // dan RSI di atas 30
+   bool isSellSignal = (maFastPrev > maSlowPrev) && (maFast < maSlow) && (rsi > RSI_Oversold);
 
    // === LANGKAH 5: Eksekusi order ===
    if(isBuySignal)
@@ -80,8 +88,11 @@ void OnTick()
       double sl         = entryPrice - slPoints;
       double tp         = entryPrice + tpPoints;
 
-      OrderSend(Symbol(), OP_BUY, Lot_Size, entryPrice, 3, sl, tp, "Metavest BUY", 0, 0, clrGreen);
-      Print("BUY order sent | Entry: ", entryPrice, " SL: ", sl, " TP: ", tp);
+      int ticket = OrderSend(Symbol(), OP_BUY, Lot_Size, entryPrice, 3, sl, tp, "Metavest BUY", 0, 0, clrGreen);
+      if(ticket < 0)
+        Print("BUY order failed | Error: ", ErrorDescription(GetLastError()));
+      else
+        Print("BUY order sent | Entry: ", entryPrice, " SL: ", sl, " TP: ", tp);
      }
 
    if(isSellSignal)
@@ -90,8 +101,11 @@ void OnTick()
       double sl         = entryPrice + slPoints;
       double tp         = entryPrice - tpPoints;
 
-      OrderSend(Symbol(), OP_SELL, Lot_Size, entryPrice, 3, sl, tp, "Metavest SELL", 0, 0, clrRed);
-      Print("SELL order sent | Entry: ", entryPrice, " SL: ", sl, " TP: ", tp);
+      int ticket = OrderSend(Symbol(), OP_SELL, Lot_Size, entryPrice, 3, sl, tp, "Metavest SELL", 0, 0, clrRed);
+      if(ticket < 0)
+        Print("SELL order failed | Error: ", ErrorDescription(GetLastError()));
+      else
+        Print("SELL order sent | Entry: ", entryPrice, " SL: ", sl, " TP: ", tp);
      }
   }
 
